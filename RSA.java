@@ -1,56 +1,47 @@
-import java.io.*;
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
 
-public class RSA {
-	public static double gcd(double a, double b)
-	{
-		if(b==0) return a;
-        return gcd(b,a%b);
-			}
-	public static void main(String[] args) 
-	{
-		Scanner sc=new Scanner(System.in);
-		System.out.print("Enter value for 'p': ");
-		Double p=sc.nextDouble();
-		System.out.print("Enter value for 'q': ");
-		Double q=sc.nextDouble();
-		System.out.print("Enter value for 'message': ");
-		Double msg=sc.nextDouble();
+class RSA {
 
-		// Stores the first part of public key:
-		double n = p * q;
+    public static BigInteger encryptOrDecrypt(BigInteger m, BigInteger e, BigInteger n) {
+        return m.modPow(e, n);
+    }
 
-		// Finding the other part of public key.
-		// double e stands for encrypt
-		double e = 2;
-		double phi = (p - 1) * (q - 1);
-		while (e < phi) {
-			
-			if (gcd(e, phi) == 1)
-				break;
-			else
-				e++;
-		}
-		int k = 2; // A constant value
-		double d = (1 + (k * phi)) / e;
 
-		
+    public static BigInteger generatePrivateKey(BigInteger e, BigInteger phi) {
+        return e.modInverse(phi);
+    }
 
-		System.out.println("Message data = " + msg);
+    public static void main(String[] args) {
 
-		// Encryption c = (msg ^ e) % n
-		double c = Math.pow(msg, e);
-		c = c % n;
-		System.out.println("Encrypted data = " + c);
+        BigInteger p = BigInteger.valueOf(61);
+        BigInteger q = BigInteger.valueOf(53);
+        
+        // Calculate n = p * q
+        BigInteger n = p.multiply(q);
+        
+        // Calculate phi = (p - 1) * (q - 1)
+        BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+        
+        
+        BigInteger e = BigInteger.valueOf(17);
+        
 
-		// Decryption m = (c ^ d) % n
-		double m = Math.pow(c, d);
-		m = m % n;
-		System.out.println("Decrypted Data = " + m);
+        BigInteger d = generatePrivateKey(e, phi);
+        
+     
+        BigInteger m = BigInteger.valueOf(65); 
+        
 
-		System.out.println("Public Key : (e ,n) : ( "+e+" , "+n+" )");
-		System.out.println("Private Key : (d ,n) : ( "+d+" , "+n+" )");
-		sc.close();
-	}
+        BigInteger c = encryptOrDecrypt(m, e, n);
+        
+
+        BigInteger decrypted = encryptOrDecrypt(c, d, n);
+        
+
+        System.out.println("Public Key (e, n) = (" + e + ", " + n + ")");
+        System.out.println("Private Key (d) = " + d);
+        System.out.println("Plaintext (m) = " + m);
+        System.out.println("Encrypted message (c) = " + c);
+        System.out.println("Decrypted message = " + decrypted);
+    }
 }
